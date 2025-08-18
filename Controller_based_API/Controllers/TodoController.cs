@@ -46,7 +46,7 @@ namespace Controller_based_API.Controllers
             return items;
         }
 
-        // // GET: api/Todo/5
+        // GET: api/Todo/5
         // [HttpGet("{id}")]
         // public async Task<ActionResult<TodoItemDTO>> GetTodoItem(string id)
         // {
