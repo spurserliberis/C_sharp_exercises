@@ -47,18 +47,18 @@ namespace Controller_based_API.Controllers
         }
 
         // GET: api/Todo/5
-        // [HttpGet("{id}")]
-        // public async Task<ActionResult<TodoItemDTO>> GetTodoItem(string id)
-        // {
-        //     var todoItem = await _todoRepository.GetTodoItem(id);
-        //
-        //     if (todoItem == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //
-        //     return ItemToDTO(todoItem);
-        // }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TodoItemDTO>> GetTodoItem(string id)
+        {
+            var todoItem = await _todoRepository.GetTodoItem(id);
+        
+            if (todoItem == null)
+            {
+                return NotFound();
+            }
+        
+            return ItemToDTO(todoItem);
+        }
 
   //       // PUT: api/Todo/5
 		// // PUT updates and existing resource

@@ -2,7 +2,8 @@ using Controller_based_API.Controllers;
 using Controller_based_API.Models;
 using Controller_based_API.Repositories;
 using FluentAssertions;
-using Moq;
+using Microsoft.AspNetCore.Mvc;
+using NSubstitute;
 using Xunit;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
@@ -12,19 +13,16 @@ public class TodoControllerTests()
 {
     // Test the gettodoitems function, which returns the entire list
     [Fact]
-    public async Task GetTodoItems_ReturnsEmptyList()
+    public async Task GetTodoItems_DatabaseIsEmpty_ReturnsEmptyList()
     {
         // Arrange
         // Sets up the mock todoitems
         // initialises a new mock of the interface repo
-        var mockRepo = new Mock<ITodoRepository>();
-        // sets up the mock to implement the gettodoitems method, which takes and returns an empty list of todoitem
-        mockRepo.Setup(repo => repo.GetTodoItems())
-            .ReturnsAsync(new List<TodoItem>());
+        var mockRepo = Substitute.For<ITodoRepository>();
+        mockRepo.GetTodoItems().Returns(new List<TodoItem>());
+        var controller = new TodoController(mockRepo);
         // initialises an instance of the controller, which takes the mock as an object
         // this is done to mimic the method, which uses the repo interface to talk to the dbcontext,
-        // and then is passed to the controller
-        var controller = new TodoController(mockRepo.Object);
         
         // Act
         // response implements the method under test. Inside, the controller awaits the repo, gets the empty list,
@@ -39,7 +37,7 @@ public class TodoControllerTests()
     }
 
     [Fact]
-    public async Task GetTodoItems_ReturnsSingleTodoItem()
+    public async Task GetTodoItems_DatabaseContainsOneList_ReturnsSingleTodoItem()
     {
         // Arrange
         long testId = 1;
@@ -62,34 +60,36 @@ public class TodoControllerTests()
             },
         };
 
-        var mockRepo = new Mock<ITodoRepository>();
-        // sets up the mock to implement the gettodoitems method, which takes and returns an empty list of todoitem
-        mockRepo.Setup(repo => repo.GetTodoItems())
-            .ReturnsAsync(testList);
-
-        var controller = new TodoController(mockRepo.Object);
+        var mockRepo = Substitute.For<ITodoRepository>();
+        mockRepo.GetTodoItems().Returns(testList);
+        var controller = new TodoController(mockRepo);
         
         // Act
         var response = await controller.GetTodoItems();
         var result = response.Value;
+        var expected = new List<TodoItemDTO>(){new TodoItemDTO()
+        {                
+            Id = testId,
+            Name = testName,
+            IsComplete = testIsComplete
+        }};
         
         // Assert
-        result.Should().BeEquivalentTo(response.Value);
-
+        result.Should().BeEquivalentTo(expected);
     }
-    
+
     [Fact]
-    public async Task GetTodoItems_ReturnsTwoTodoItems()
+    public async Task GetTodoItems_DatabaseContainsTwoLists_ReturnsTwoTodoItems()
     {
         // Arrange
         long testId = 1;
         string testName = "test one";
         bool testIsComplete = true;
-        
+
         long testIdTwo = 2;
         string testNameTwo = "test two";
         bool testIsCompleteTwo = false;
-        
+
         var testList = new List<TodoItem>
         {
             new TodoItem
@@ -105,23 +105,99 @@ public class TodoControllerTests()
                 IsComplete = testIsCompleteTwo
             }
         };
-    
-        var mockRepo = new Mock<ITodoRepository>();
-        mockRepo.Setup(repo => repo.GetTodoItems())
-            .ReturnsAsync(testList);
-    
-        var controller = new TodoController(mockRepo.Object);
-        
+
+        var mockRepo = Substitute.For<ITodoRepository>();
+        mockRepo.GetTodoItems().Returns(testList);
+        var controller = new TodoController(mockRepo);
+
         // Act
         var response = await controller.GetTodoItems();
         var result = response.Value;
-        
+        var expected = new List<TodoItemDTO>(){new TodoItemDTO()
+        {                
+            Id = testId,
+            Name = testName,
+            IsComplete = testIsComplete
+        },
+        new TodoItemDTO()
+        {                
+            Id = testIdTwo,
+            Name = testNameTwo,
+            IsComplete = testIsCompleteTwo
+        }
+        };
+
         // Assert
-        result.Should().BeEquivalentTo(response.Value);
-        // Assert.Equals(testId, result[0].Id);     
-        // Assert.Equals(testName, result[0].Name);
-        // Assert.Equals(testIsComplete, result[0].IsComplete);
+        result.Should().BeEquivalentTo(expected);
     }
     
+    [Fact]
+    public async Task GetTodoItem_IdIsEmpty_ReturnsNotFound()
+    {
+        // Arrange
+        var mockRepo = Substitute.For<ITodoRepository>();
+        // returnsthis: is todoitem? as the code is calling the repo method, not the controller
+        mockRepo.GetTodoItem("").Returns((TodoItem?)null);
+        // initialising the controller returns task<todoitemdto>
+        var controller = new TodoController(mockRepo);
+        
+        // Act
+        var response = await controller.GetTodoItem("");
+        
+        // Assert
+        // Need to use result below as response is an ActionResult<TodoItemDTO>, not a plain IActionResult
+        // result is needed to check the .Result property.
+        response.Result.Should().BeOfType<NotFoundResult>();
+
+    }
     
+    [Fact]
+    public async Task GetTodoItem_IdIsIncorrect_ReturnsNotFound()
+    {
+        // Arrange
+        var mockRepo = Substitute.For<ITodoRepository>();
+        mockRepo.GetTodoItem("2").Returns((TodoItem?)null);
+        var controller = new TodoController(mockRepo);
+        
+        // Act
+        var response = await controller.GetTodoItem("2");
+        
+        // Assert
+        response.Result.Should().BeOfType<NotFoundResult>();
+
+    }
+    [Fact]
+    public async Task GetTodoItem_IdIsCorrect_ReturnsTodoItemDTO()
+    {
+        // Arrange
+        long testId = 100;
+        string testName = "test get one";
+        bool testIsComplete = true;
+
+        var testList = new TodoItem
+        {
+            Id = testId,
+            Name = testName,
+            IsComplete = testIsComplete
+        };
+
+        var mockRepo = Substitute.For<ITodoRepository>();
+        mockRepo.GetTodoItem("100").Returns(testList);
+        var controller = new TodoController(mockRepo);
+        
+        // Act
+        var response = await controller.GetTodoItem("100");
+        var result = response.Value;
+        // convert todoitem into a dto to match the controllers output
+        var expected = new TodoItemDTO
+            {                
+                Id = testId,
+                Name = testName,
+                IsComplete = testIsComplete
+            };
+        
+        // Assert
+        result.Should().BeEquivalentTo(expected);
+
+    }
 }
