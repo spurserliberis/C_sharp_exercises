@@ -60,39 +60,37 @@ namespace Controller_based_API.Controllers
             return ItemToDTO(todoItem);
         }
 
-  //       // PUT: api/Todo/5
-		// // PUT updates and existing resource
-  //       // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-  //       [HttpPut("{id}")]
-  //       public async Task<IActionResult> PutTodoItem(long id, TodoItemDTO todoItemDTO)
-  //       {
-  //           // Getting a DTO from the user, but the model is a todoItem. Need to convert DTO to check if it exists in db
-  //           // if the id doesn't match the id in the request
-  //           if (id != todoItemDTO.Id)
-  //           {
-  //               return BadRequest();
-  //           }
-  //
-  //           await _todoRepository.PutTodoItem(id, DTOToItem(todoItemDTO));
-  //
-  //           _todoRepository.TodoItems.Name = todoItemDTO.Name;
-  //           todoItem.IsComplete = todoItemDTO.IsComplete;
-  //
-  //           try
-  //           {
-  //               await _todoRepository.SaveChangesAsync();
-  //           }
-  //           catch (DbUpdateConcurrencyException) when (!TodoItemExists(id))
-  //           {
-  //               return NotFound();
-  //           }
-  //
-  //           return NoContent();
-  //       }
-  //
-  //       // POST: api/Todo
-		// // Post creates a new resource
-  //       // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // PUT: api/Todo/5
+		// PUT updates and existing resource
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutTodoItem(long id, TodoItemDTO todoItemDTO)
+        {
+            // Getting a DTO from the user, but the model is a todoItem. Need to convert DTO to check if it exists in db
+            // if the id doesn't match the id in the request
+            if (id != todoItemDTO.Id)
+            {
+                return BadRequest();
+            }
+            
+            var todoItem = DTOToItem(todoItemDTO);
+           
+            try
+            {
+                await _todoRepository.PutTodoItem(id, todoItem);
+            }
+            catch (DbUpdateConcurrencyException) when (!TodoItemExists(id))
+            {
+                // if the IDs match, but the item doesn’t exist in the DB.
+                return NotFound();
+            }
+            
+            return NoContent();
+            }
+  
+        // POST: api/Todo
+		// Post creates a new resource
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
   //       [HttpPost]
   //       public async Task<ActionResult<TodoItemDTO>> PostTodoItem(TodoItemDTO todoItemDTO)
   //       {
@@ -102,26 +100,26 @@ namespace Controller_based_API.Controllers
 		// 	return CreatedAtAction(nameof(GetTodoItem), new { id = todoItemDTO.Id }, todoItemDTO);
   //       }
   //
-  //       // DELETE: api/Todo/5
-  //       [HttpDelete("{id}")]
-  //       public async Task<IActionResult> DeleteTodoItem(TodoItem item)
-  //       {
-  //           var todoItem = await _todoRepository.DeleteTodoItem(item).FindAsync(item);
-  //           if (todoItem == null)
-  //           {
-  //               return NotFound();
-  //           }
+  // // DELETE: api/Todo/5
+  // [HttpDelete("{id}")]
+  // public async Task<IActionResult> DeleteTodoItem(TodoItem item)
+  // {
+  //     var todoItem = await _todoRepository.DeleteTodoItem(item).FindAsync(item);
+  //     if (todoItem == null)
+  //     {
+  //         return NotFound();
+  //     }
   //
-  //           _todoRepository.DeleteTodoItem().Remove(todoItem);
-  //           await _todoRepository.SaveChangesAsync();
+  //     _todoRepository.DeleteTodoItem().Remove(todoItem);
+  //     await _todoRepository.SaveChangesAsync();
   //
-  //           return NoContent();
-  //       }
+  //     return NoContent();
+  // }
 
-        // private bool TodoItemExists(long id)
-        // {
-        //     return _todoRepository.TodoItemExists(id);
-        // }
+        private bool TodoItemExists(long id)
+        {
+            return _todoRepository.TodoItemExists(id);
+        }
         private static TodoItemDTO ItemToDTO(TodoItem todoItem) =>
             new TodoItemDTO
             {
@@ -129,12 +127,12 @@ namespace Controller_based_API.Controllers
                 Name = todoItem.Name,
                 IsComplete = todoItem.IsComplete
             };
-        // private static TodoItem DTOToItem(TodoItemDTO todoItemDTO) =>
-        //     new TodoItem
-        //     {
-        //         Id = todoItemDTO.Id,
-        //         Name = todoItemDTO.Name,
-        //         IsComplete = todoItemDTO.IsComplete
-        //     };
+        private static TodoItem DTOToItem(TodoItemDTO todoItemDTO) =>
+            new TodoItem
+            {
+                Id = todoItemDTO.Id,
+                Name = todoItemDTO.Name,
+                IsComplete = todoItemDTO.IsComplete
+            };
     }
 }

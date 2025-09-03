@@ -27,11 +27,14 @@ public class TodoRepository : ITodoRepository
     }
     
     // Update is put
+    // Any changes to database calls SaveChanges so controllers don't need to
+    
+    // repository uses todoItem whereas controller uses the DTO.
+    // 
     public async Task PutTodoItem(long id, TodoItem todoItem)
     {
-        _todoContext.TodoItems.Add(todoItem);
+        _todoContext.Entry(todoItem).State = EntityState.Modified;
         await _todoContext.SaveChangesAsync();
-        // implement an update
     }
     
     // Create is post
@@ -53,4 +56,9 @@ public class TodoRepository : ITodoRepository
          return _todoContext.TodoItems.Any(e => e.Id == id);
 
     }
+    public async Task SaveChangesAsync()
+    {
+        await _todoContext.SaveChangesAsync();
+    }
+
 }

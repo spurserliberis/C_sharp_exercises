@@ -21,3 +21,15 @@ DbContext → TodoContext uses EF Core to execute SQL against the database table
 Result → The returned list of TodoItem entities is projected into DTOs and returned to the API client.
 
 ![Diagram](./Images/Diagram.png)
+
+HTTP request → 
+Routing matches api/Todo/{id} → 
+TodoController action runs → 
+calls ITodoRepository (interface) → 
+TodoRepository (implementation) uses TodoContext (EF Core DbContext) → 
+hits the database → 
+back up the chain → 
+controller maps Entity (i.e TodoItem) → 
+DTO → 
+returns ActionResult<T> → 
+ASP.NET Core serializes JSON + HTTP status.

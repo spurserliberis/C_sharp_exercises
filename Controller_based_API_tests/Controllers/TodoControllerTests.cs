@@ -1,9 +1,12 @@
+using AutoFixture;
 using Controller_based_API.Controllers;
 using Controller_based_API.Models;
 using Controller_based_API.Repositories;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Xunit;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
@@ -11,6 +14,7 @@ namespace Controller_based_API_tests.Controllers;
 
 public class TodoControllerTests()
 {
+    private readonly Fixture _fixture = new();
     // Test the gettodoitems function, which returns the entire list
     [Fact]
     public async Task GetTodoItems_DatabaseIsEmpty_ReturnsEmptyList()
@@ -173,7 +177,7 @@ public class TodoControllerTests()
         long testId = 100;
         string testName = "test get one";
         bool testIsComplete = true;
-
+        
         var testList = new TodoItem
         {
             Id = testId,
@@ -200,4 +204,108 @@ public class TodoControllerTests()
         result.Should().BeEquivalentTo(expected);
 
     }
+    
+    [Fact]
+    // route id does not match the dto id
+    public async Task PutTodoItem_IdIsNotInDatabase_ReturnsBadRequest()
+    {
+        // Arrange
+        long testId = 1;
+        string testName = "test put one";
+        bool testIsComplete = true;
+        
+        var dto = new TodoItemDTO
+        {
+            Id = testId,
+            Name = testName,
+            IsComplete = testIsComplete
+        };
+        
+        var mockRepo = Substitute.For<ITodoRepository>();
+        // below line found in GetTodoItem is not needed here
+        // don't need to mock as dto.id is 1, whereas the route parameter is 2, result in this
+        // id != todoItemDTO.Id being true and returning a badrequest
+        // mockRepo.PutTodoItem(dto).Returns(Task.FromResult);
+        var controller = new TodoController(mockRepo);
+        
+        // Act
+        var response = await controller.PutTodoItem(2, dto);
+        
+        // Assert
+        response.Should().BeOfType<BadRequestResult>();
+    }
+    
+    [Fact]
+    // route id does not match the dto id
+    // controller → repository → exception → controller result → test assertion.
+    public async Task PutTodoItem_IdMatchesButNotInDatabase_ReturnsNotFound()
+    {
+        // Arrange
+        // The route id that the controller will receive
+        long testId = 1;
+        
+        // Fake dto sent by client side.
+        // Creates a fake id that is the same as the route, so that the controller doesn't
+        // return BadRequest, going into the NotFound branch
+        var testListDto = new TodoItemDTO
+        {
+            Id = testId,
+            Name = "test one",
+            IsComplete = true
+        };
+        // Uses NSubstitute to create a mock of the interface
+        var mockRepo = Substitute.For<ITodoRepository>();
+        // Simulate repository throwing concurrency exception because item not found
+        // Whenever the controller calls PutTodoItem(1, someTodoItem), throw a
+        // DbUpdateConcurrencyException instead of actually saving to the database.
+        mockRepo.PutTodoItem(testId, Arg.Any<TodoItem>())
+            .ThrowsAsync(new DbUpdateConcurrencyException());
+
+        // Creates the SUT, system under test by creating an instance of the actual todocontroller
+        // This simulates the "id matches DTO id, but item isn’t in DB" case.
+        var controller = new TodoController(mockRepo);
+
+        // Act
+        // Calls the controller method under test with the route id (1) and the DTO.
+        // Flow inside controller:
+        // Checks if route id == DTO id → ✅ passes.
+        // Calls _todoRepository.PutTodoItem(1, TodoItem).
+        // Mocked repository throws DbUpdateConcurrencyException.
+        // Controller catches it in the catch block.
+        // Controller returns NotFound().
+        // So at this point response should be a NotFoundResult.
+        var response = await controller.PutTodoItem(testId, testListDto);
+
+        // Assert
+        // Assertion using FluentAssertions.
+        // Verifies that the actual response is exactly the type NotFoundResult.
+        // If controller had returned anything else (e.g., NoContent or BadRequest), the test would fail.
+        response.Should().BeOfType<NotFoundResult>();
+    }
+    
+    [Fact]
+    public async Task PutTodoItem_IdMatchesAndInDatabase_UpdatesDatabase()
+    {
+        // Arrange
+        long testId = 1;
+
+        var testListDto = new TodoItemDTO
+        {
+            Id = testId,
+            Name = "test one",
+            IsComplete = true
+        };
+        var mockRepo = Substitute.For<ITodoRepository>();
+        mockRepo.PutTodoItem(testId, Arg.Any<TodoItem>())
+            .ThrowsAsync(new DbUpdateConcurrencyException());
+
+        var controller = new TodoController(mockRepo);
+
+        // Act
+        var response = await controller.PutTodoItem(testId, testListDto);
+
+        // Assert
+        response.Should().BeOfType<NotFoundResult>();
+    }
+    
 }

@@ -21,6 +21,7 @@
         ],
         "sources": {
           "https://api.nuget.org/v3/index.json": {},
+          "https://liberis-dev.pkgs.visualstudio.com/_packaging/MyLiberis/nuget/v3/index.json": {},
           "https://nuget.pkg.github.com/LiberisFinance/index.json": {}
         },
         "frameworks": {
