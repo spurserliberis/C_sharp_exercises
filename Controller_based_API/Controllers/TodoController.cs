@@ -127,7 +127,7 @@ namespace Controller_based_API.Controllers
                 Name = todoItem.Name,
                 IsComplete = todoItem.IsComplete
             };
-        private static TodoItem DTOToItem(TodoItemDTO todoItemDTO) =>
+        public static TodoItem DTOToItem(TodoItemDTO todoItemDTO) =>
             new TodoItem
             {
                 Id = todoItemDTO.Id,

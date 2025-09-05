@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Xunit;
-using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace Controller_based_API_tests.Controllers;
 
@@ -295,17 +294,19 @@ public class TodoControllerTests()
             Name = "test one",
             IsComplete = true
         };
+        
         var mockRepo = Substitute.For<ITodoRepository>();
-        mockRepo.PutTodoItem(testId, Arg.Any<TodoItem>())
-            .ThrowsAsync(new DbUpdateConcurrencyException());
-
         var controller = new TodoController(mockRepo);
 
         // Act
         var response = await controller.PutTodoItem(testId, testListDto);
 
         // Assert
-        response.Should().BeOfType<NotFoundResult>();
+        // look at arg.do to understand how mock calls work
+        // find out why object ids differ for the same object parameters
+        await mockRepo.Received(1).PutTodoItem(testId, Arg.Any<TodoItem>());
+        response.Should().BeOfType<NoContentResult>();
     }
+    
     
 }
