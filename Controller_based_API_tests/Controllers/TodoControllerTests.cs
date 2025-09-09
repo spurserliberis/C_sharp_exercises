@@ -308,5 +308,29 @@ public class TodoControllerTests()
         response.Should().BeOfType<NoContentResult>();
     }
     
+    [Fact]
+    public async Task PostTodoItem_UpdatesDatabase()
+    {
+        // Arrange
+        long testId = 1;
+
+        var testListDto = new TodoItemDTO
+        {
+            Id = testId,
+            Name = "test put",
+            IsComplete = true
+        };
+        
+        var mockRepo = Substitute.For<ITodoRepository>();
+        var controller = new TodoController(mockRepo);
+
+        // Act
+        var response = await controller.PostTodoItem(testListDto);
+        var result = response.Result;
+
+        // Assert
+        result.Should().BeOfType<CreatedAtActionResult>();
+        result.Should().NotBeNull();
+    }
     
 }

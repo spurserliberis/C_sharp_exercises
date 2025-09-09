@@ -11,3 +11,6 @@ public interface ITodoRepository
     public bool TodoItemExists(long id);
     // Task SaveChangesAsync();
 }
+
+// These are a method declarations, which are variables that live
+// inside a class. They have a return type, name and parameter list.

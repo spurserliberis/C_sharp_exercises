@@ -91,14 +91,14 @@ namespace Controller_based_API.Controllers
         // POST: api/Todo
 		// Post creates a new resource
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-  //       [HttpPost]
-  //       public async Task<ActionResult<TodoItemDTO>> PostTodoItem(TodoItemDTO todoItemDTO)
-  //       {
-  //           _todoRepository.PostTodoItem(todoItemDTO).Add(DTOToItem(todoItemDTO));
-  //           await _todoRepository.SaveChangesAsync();
-  //
-		// 	return CreatedAtAction(nameof(GetTodoItem), new { id = todoItemDTO.Id }, todoItemDTO);
-  //       }
+        [HttpPost]
+        public async Task<ActionResult<TodoItemDTO>> PostTodoItem(TodoItemDTO todoItemDTO)
+        {
+            var todoItem = DTOToItem(todoItemDTO);
+            await _todoRepository.PostTodoItem(todoItem);
+  
+			return CreatedAtAction(nameof(GetTodoItem), new { id = todoItemDTO.Id }, todoItemDTO);
+        }
   //
   // // DELETE: api/Todo/5
   // [HttpDelete("{id}")]
