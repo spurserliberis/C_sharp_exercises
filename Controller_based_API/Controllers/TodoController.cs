@@ -99,22 +99,22 @@ namespace Controller_based_API.Controllers
   
 			return CreatedAtAction(nameof(GetTodoItem), new { id = todoItemDTO.Id }, todoItemDTO);
         }
-  //
-  // // DELETE: api/Todo/5
-  // [HttpDelete("{id}")]
-  // public async Task<IActionResult> DeleteTodoItem(TodoItem item)
-  // {
-  //     var todoItem = await _todoRepository.DeleteTodoItem(item).FindAsync(item);
-  //     if (todoItem == null)
-  //     {
-  //         return NotFound();
-  //     }
-  //
-  //     _todoRepository.DeleteTodoItem().Remove(todoItem);
-  //     await _todoRepository.SaveChangesAsync();
-  //
-  //     return NoContent();
-  // }
+  
+        // DELETE: api/Todo/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTodoItem(TodoItem item)
+        {
+        var todoItem = await _todoRepository.DeleteTodoItem(item).FindAsync(item);
+        if (todoItem == null)
+        {
+          return NotFound();
+        }
+  
+        _todoRepository.DeleteTodoItem().Remove(todoItem);
+        await _todoRepository.SaveChangesAsync();
+  
+        return NoContent();
+        }
 
         private bool TodoItemExists(long id)
         {

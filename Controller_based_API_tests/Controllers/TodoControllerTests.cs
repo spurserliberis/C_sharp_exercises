@@ -326,11 +326,55 @@ public class TodoControllerTests()
 
         // Act
         var response = await controller.PostTodoItem(testListDto);
+        // post returns a CreatedAtAction, which is a result object, not just the DTO
+        // So need to use result to unwrap the actual result.
         var result = response.Result;
 
         // Assert
         result.Should().BeOfType<CreatedAtActionResult>();
         result.Should().NotBeNull();
+    }
+    
+    [Fact]
+    public async Task DeleteTodoItem_UpdatesDatabase()
+    {
+        // Arrange
+        long testId = 1;
+
+        var testListDto = new TodoItemDTO
+        {
+            Id = testId,
+            Name = "test put",
+            IsComplete = true
+        };
+        
+        var mockRepo = Substitute.For<ITodoRepository>();
+        var controller = new TodoController(mockRepo);
+
+        // Act
+        var response = await controller.PostTodoItem(testListDto);
+        var result = response.Result;
+
+        // Assert
+        result.Should().BeOfType<CreatedAtActionResult>();
+        result.Should().NotBeNull();
+        
+        
+        // Arrange
+        var mockRepo = Substitute.For<ITodoRepository>();
+        // returnsthis: is todoitem? as the code is calling the repo method, not the controller
+        mockRepo.GetTodoItem("").Returns((TodoItem?)null);
+        // initialising the controller returns task<todoitemdto>
+        var controller = new TodoController(mockRepo);
+        
+        // Act
+        var response = await controller.GetTodoItem("");
+        
+        // Assert
+        // Need to use result below as response is an ActionResult<TodoItemDTO>, not a plain IActionResult
+        // result is needed to check the .Result property.
+        response.Result.Should().BeOfType<NotFoundResult>();
+
     }
     
 }
