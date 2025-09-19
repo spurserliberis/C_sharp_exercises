@@ -140,12 +140,12 @@ public class TodoControllerTests()
         // Arrange
         var mockRepo = Substitute.For<ITodoRepository>();
         // returnsthis: is todoitem? as the code is calling the repo method, not the controller
-        mockRepo.GetTodoItem("").Returns((TodoItem?)null);
+        mockRepo.GetTodoItem(0).Returns((TodoItem?)null);
         // initialising the controller returns task<todoitemdto>
         var controller = new TodoController(mockRepo);
         
         // Act
-        var response = await controller.GetTodoItem("");
+        var response = await controller.GetTodoItem(0);
         
         // Assert
         // Need to use result below as response is an ActionResult<TodoItemDTO>, not a plain IActionResult
@@ -159,11 +159,11 @@ public class TodoControllerTests()
     {
         // Arrange
         var mockRepo = Substitute.For<ITodoRepository>();
-        mockRepo.GetTodoItem("2").Returns((TodoItem?)null);
+        mockRepo.GetTodoItem(2).Returns((TodoItem?)null);
         var controller = new TodoController(mockRepo);
         
         // Act
-        var response = await controller.GetTodoItem("2");
+        var response = await controller.GetTodoItem(2);
         
         // Assert
         response.Result.Should().BeOfType<NotFoundResult>();
@@ -185,11 +185,11 @@ public class TodoControllerTests()
         };
 
         var mockRepo = Substitute.For<ITodoRepository>();
-        mockRepo.GetTodoItem("100").Returns(testList);
+        mockRepo.GetTodoItem(100).Returns(testList);
         var controller = new TodoController(mockRepo);
         
         // Act
-        var response = await controller.GetTodoItem("100");
+        var response = await controller.GetTodoItem(100);
         var result = response.Value;
         // convert todoitem into a dto to match the controllers output
         var expected = new TodoItemDTO
@@ -220,11 +220,13 @@ public class TodoControllerTests()
             IsComplete = testIsComplete
         };
         
+        // NOTE REGARDING CALLING METHOD UNDER TEST: don't need to configure PutTodoItem in the test, as the method returns a Task only
+        // which means that it doesn't return data to the caller
+   
         var mockRepo = Substitute.For<ITodoRepository>();
         // below line found in GetTodoItem is not needed here
         // don't need to mock as dto.id is 1, whereas the route parameter is 2, result in this
         // id != todoItemDTO.Id being true and returning a badrequest
-        // mockRepo.PutTodoItem(dto).Returns(Task.FromResult);
         var controller = new TodoController(mockRepo);
         
         // Act
@@ -296,14 +298,20 @@ public class TodoControllerTests()
         };
         
         var mockRepo = Substitute.For<ITodoRepository>();
+        
+        // don't need to implement mockRepo.puttodoitem as NSubstitute configures this behaviour when:
+        // 1. want the method to return a value.
+        // 2. You want it to throw an exception.
+        // 3 You want to validate the parameters exactly.
+        // In this case, PutTodoItem returns Task (no value).
+        // By default, NSubstitute will just return a dummy Task.CompletedTask.
+        // Since you don’t care about what it returns, you don’t need to configure it.
         var controller = new TodoController(mockRepo);
 
         // Act
         var response = await controller.PutTodoItem(testId, testListDto);
 
         // Assert
-        // look at arg.do to understand how mock calls work
-        // find out why object ids differ for the same object parameters
         await mockRepo.Received(1).PutTodoItem(testId, Arg.Any<TodoItem>());
         response.Should().BeOfType<NoContentResult>();
     }
@@ -332,15 +340,17 @@ public class TodoControllerTests()
 
         // Assert
         result.Should().BeOfType<CreatedAtActionResult>();
+        // mockrepo received call to posttodoitem
+        await mockRepo.Received().PostTodoItem(Arg.Is<TodoItem>(todoItem => todoItem.Id == testId));
         result.Should().NotBeNull();
     }
     
     [Fact]
-    public async Task DeleteTodoItem_UpdatesDatabase()
+    public async Task DeleteTodoItem_SuccessfullyDeletesTestList()
     {
         // Arrange
-        long testId = 1;
-
+        long testId = 10;
+    
         var testListDto = new TodoItemDTO
         {
             Id = testId,
@@ -350,31 +360,13 @@ public class TodoControllerTests()
         
         var mockRepo = Substitute.For<ITodoRepository>();
         var controller = new TodoController(mockRepo);
-
+    
         // Act
-        var response = await controller.PostTodoItem(testListDto);
-        var result = response.Result;
-
-        // Assert
-        result.Should().BeOfType<CreatedAtActionResult>();
-        result.Should().NotBeNull();
-        
-        
-        // Arrange
-        var mockRepo = Substitute.For<ITodoRepository>();
-        // returnsthis: is todoitem? as the code is calling the repo method, not the controller
-        mockRepo.GetTodoItem("").Returns((TodoItem?)null);
-        // initialising the controller returns task<todoitemdto>
-        var controller = new TodoController(mockRepo);
-        
-        // Act
-        var response = await controller.GetTodoItem("");
+        var response = await controller.DeleteTodoItem(testListDto);
         
         // Assert
-        // Need to use result below as response is an ActionResult<TodoItemDTO>, not a plain IActionResult
-        // result is needed to check the .Result property.
-        response.Result.Should().BeOfType<NotFoundResult>();
-
+        await mockRepo.Received().DeleteTodoItem(Arg.Is<TodoItem>(todoItem => todoItem.Id == testId));
+        response.Should().BeOfType<NoContentResult>();
     }
     
 }

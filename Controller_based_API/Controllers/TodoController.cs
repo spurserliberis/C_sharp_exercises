@@ -48,7 +48,7 @@ namespace Controller_based_API.Controllers
 
         // GET: api/Todo/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TodoItemDTO>> GetTodoItem(string id)
+        public async Task<ActionResult<TodoItemDTO>> GetTodoItem(long id)
         {
             var todoItem = await _todoRepository.GetTodoItem(id);
         
@@ -96,23 +96,18 @@ namespace Controller_based_API.Controllers
         {
             var todoItem = DTOToItem(todoItemDTO);
             await _todoRepository.PostTodoItem(todoItem);
-  
-			return CreatedAtAction(nameof(GetTodoItem), new { id = todoItemDTO.Id }, todoItemDTO);
+
+            return Ok(todoItemDTO);
+            // CreatedAtAction(nameof(GetTodoItem), new { id = todoItem.Id }, todoItemDTO);
         }
   
         // DELETE: api/Todo/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTodoItem(TodoItem item)
+        public async Task<IActionResult> DeleteTodoItem(TodoItemDTO todoItemDTO)
         {
-        var todoItem = await _todoRepository.DeleteTodoItem(item).FindAsync(item);
-        if (todoItem == null)
-        {
-          return NotFound();
-        }
-  
-        _todoRepository.DeleteTodoItem().Remove(todoItem);
-        await _todoRepository.SaveChangesAsync();
-  
+        var todoItem = DTOToItem(todoItemDTO);
+        await _todoRepository.DeleteTodoItem(todoItem);
+
         return NoContent();
         }
 
@@ -127,12 +122,13 @@ namespace Controller_based_API.Controllers
                 Name = todoItem.Name,
                 IsComplete = todoItem.IsComplete
             };
-        public static TodoItem DTOToItem(TodoItemDTO todoItemDTO) =>
+        private static TodoItem DTOToItem(TodoItemDTO todoItemDTO) =>
             new TodoItem
             {
                 Id = todoItemDTO.Id,
                 Name = todoItemDTO.Name,
                 IsComplete = todoItemDTO.IsComplete
             };
+        
     }
 }

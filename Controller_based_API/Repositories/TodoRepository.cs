@@ -21,7 +21,7 @@ public class TodoRepository : ITodoRepository
         return await _todoContext.TodoItems.ToListAsync();
         
     }
-    public async Task<TodoItem?> GetTodoItem(string id)
+    public async Task<TodoItem?> GetTodoItem(long id)
     {
         return await _todoContext.TodoItems.FindAsync(id);
     }
@@ -33,7 +33,9 @@ public class TodoRepository : ITodoRepository
     // 
     public async Task PutTodoItem(long id, TodoItem todoItem)
     {
+        // Tells EF Core: “This object represents an existing row, and its values have changed.”
         _todoContext.Entry(todoItem).State = EntityState.Modified;
+        // SaveChangesAsync() commits the changes to the database with a SQL UPDATE.
         await _todoContext.SaveChangesAsync();
     }
     
@@ -56,9 +58,9 @@ public class TodoRepository : ITodoRepository
          return _todoContext.TodoItems.Any(e => e.Id == id);
 
     }
-    public async Task SaveChangesAsync()
-    {
-        await _todoContext.SaveChangesAsync();
-    }
+    // public async Task SaveChangesAsync()
+    // {
+    //     await _todoContext.SaveChangesAsync();
+    // }
 
 }
