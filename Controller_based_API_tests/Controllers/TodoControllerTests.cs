@@ -339,7 +339,7 @@ public class TodoControllerTests()
         var result = response.Result;
 
         // Assert
-        result.Should().BeOfType<CreatedAtActionResult>();
+        result.Should().BeOfType<OkObjectResult>();
         // mockrepo received call to posttodoitem
         await mockRepo.Received().PostTodoItem(Arg.Is<TodoItem>(todoItem => todoItem.Id == testId));
         result.Should().NotBeNull();
