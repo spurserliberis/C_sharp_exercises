@@ -10,7 +10,6 @@ public interface ITodoRepository
     public Task PostTodoItem(TodoItem todoItem);
     public Task DeleteTodoItem(TodoItem todoItem);
     public bool TodoItemExists(long id);
-    // Task SaveChangesAsync();
 }
 
 // These are a method declarations, which are variables that live

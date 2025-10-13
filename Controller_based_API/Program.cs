@@ -17,7 +17,6 @@ builder.Services.AddDbContext<TodoContext>(opt =>
 builder.Services.AddTransient<ITodoRepository, TodoRepository>();
 // The DI container is initialized here, allowing services to be
 // registered and injected throughout the app.
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

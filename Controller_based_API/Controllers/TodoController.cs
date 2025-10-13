@@ -36,7 +36,7 @@ namespace Controller_based_API.Controllers
             // via EF Core using the injected TodoContext.
             var items = (await _todoRepository.GetTodoItems())
                 // Each TodoItem (database entity) is mapped to a TodoItemDTO 
-                // to ensure the API doesn’t expose internal database details directly..
+                // to ensure the API doesn’t expose internal database details directly.
                 .Select(x => ItemToDTO(x))
                 // Convert the IEnumerable<TodoItemDTO> into a List<TodoItemDTO>
                 // so that the result is fully materialized before returning.
