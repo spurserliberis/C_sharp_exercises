@@ -30,7 +30,6 @@ public class TodoRepository : ITodoRepository
     // Any changes to database calls SaveChanges so controllers don't need to
     
     // repository uses todoItem whereas controller uses the DTO.
-    // 
     public async Task PutTodoItem(long id, TodoItem todoItem)
     {
         // Tells EF Core: “This object represents an existing row, and its values have changed.”

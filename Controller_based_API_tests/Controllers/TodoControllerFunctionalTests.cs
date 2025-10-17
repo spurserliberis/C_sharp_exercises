@@ -2,9 +2,7 @@ using System.Text;
 using System.Text.Json;
 using Controller_based_API.Models;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
-using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace Controller_based_API_tests.Controllers;
 
@@ -101,6 +99,56 @@ public class TodoControllerFunctionalTests(CustomiseWebApplicationFactoryTests<P
     }
     
     // POST object then implement PUT to find and replace that object
-    
+    [Fact]
+    public async Task PostThenReplaceUsingPut_TodoItemInDatabase_ReturnTrueAndReplacedItem()
+    {
+        // Arrange
+        var client = factory.CreateClient();
 
+        var testPostItem = new TodoItemDTO()
+        {
+            Id = 10,
+            Name = "clean house",
+            IsComplete = false
+        };
+        
+        var testPutItem = new TodoItemDTO()
+        {
+            Id = 11,
+            Name = "clean house and car",
+            IsComplete = true
+        };
+        
+        // Converts test dto to a JSON string. HTTP post requests transmit JSON, not C# objects
+        var testItemString = JsonSerializer.Serialize(testPostItem);
+        // Wraps JSON into a HTTPContent object. Specifies UTF-8 encoding and "application/json" as the media type
+        var stringContent = new StringContent(testItemString, Encoding.UTF8, "application/json");
+        
+        // Act
+        // Sends HTTP POST request to create new todoitem
+        var response = await client.PostAsync("api/Todo", stringContent);
+        response.EnsureSuccessStatusCode(); // Status Code 200-299
+        var responseString = await response.Content.ReadAsStringAsync();
+        var testItemResponse = JsonSerializer.Deserialize<TodoItemDTO>(responseString, JsonSerializerOptions.Web);
+        var createdTodoItem = await client.GetAsync($"api/Todo/{testItemResponse?.Id}");
+        
+        var responseGetString = await createdTodoItem.Content.ReadAsStringAsync();
+        var testGetItemResponse = JsonSerializer.Deserialize<TodoItemDTO>(responseGetString, JsonSerializerOptions.Web);
+        
+        // PUT item, find the POST item and replace
+        var testPutItemString = JsonSerializer.Serialize(testPutItem);
+        var stringPutContent = new StringContent(testPutItemString, Encoding.UTF8, "application/json");
+        
+        var putResponse = await client.PutAsync("api/Todo/{testItemResponse?.Id}", stringPutContent);
+        response.EnsureSuccessStatusCode();
+        var putResponseString = await putResponse.Content.ReadAsStringAsync();
+        
+        // Assert
+        // Test POST response
+        (testGetItemResponse?.Id).Should().Be(testPostItem.Id);
+        (testGetItemResponse?.Name).Should().Be(testPostItem.Name);
+        (testGetItemResponse?.IsComplete).Should().BeFalse();
+        
+    }
+    
 }
