@@ -98,7 +98,6 @@ namespace Controller_based_API.Controllers
             await _todoRepository.PostTodoItem(todoItem);
 
             return Ok(todoItemDTO);
-            // CreatedAtAction(nameof(GetTodoItem), new { id = todoItem.Id }, todoItemDTO);
         }
   
         // DELETE: api/Todo/5
