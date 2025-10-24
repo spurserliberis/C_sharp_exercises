@@ -20,7 +20,7 @@ DbContext → TodoContext uses EF Core to execute SQL against the database table
 
 Result → The returned list of TodoItem entities is projected into DTOs and returned to the API client.
 
-![Diagram](Images/Diagram.png)
+![Diagram](Controller_based_API/Images/Diagram.png)
 
 HTTP request → 
 Routing matches api/Todo/{id} → 
