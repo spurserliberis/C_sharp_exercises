@@ -155,39 +155,40 @@ public class TodoControllerFunctionalTests(CustomiseWebApplicationFactoryTests<P
         (updatedItem?.IsComplete).Should().BeTrue();
     }
 
-    // [Fact]
-    // public async Task PostThenDelete_TodoItemInDatabase_ReturnTrue()
-    // {
-    // // Arrange
-    //     var client = factory.CreateClient();
-    //
-    //     var testDeleteItem = new TodoItemDTO()
-    //     {
-    //         Id = 100,
-    //         Name = "Buy food",
-    //         IsComplete = false
-    //     };
-    //     
-    //     // Serialize for POST
-    //     var postContent = new StringContent(JsonSerializer.Serialize(testDeleteItem), Encoding.UTF8, "application/json");
-    //
-    //     // POST (Create)
-    //     var postResponse = await client.PostAsync("api/Todo", postContent);
-    //     postResponse.EnsureSuccessStatusCode();
-    //
-    //     var postBody = await postResponse.Content.ReadAsStringAsync();
-    //     var createdItem = JsonSerializer.Deserialize<TodoItemDTO>(postBody, JsonSerializerOptions.Web);
-    //
-    //     // DELETE with correct route containing ID
-    //     var deleteResponse = await client.DeleteAsync($"api/Todo/{testDeleteItem.Id}");
-    //
-    //     // Assert
-    //     // POST created initial item
-    //     (createdItem?.Name).Should().Be(testDeleteItem.Name);
-    //     (createdItem?.IsComplete).Should().BeFalse();
-    //
-    //     // DELETE item no longer exists
-    //     deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
-    // }
+    [Fact]
+    public async Task PostThenDelete_TodoItemInDatabase_ReturnTrue()
+    {
+        // Arrange
+        var client = factory.CreateClient();
+    
+        var testDeleteItem = new TodoItemDTO()
+        {
+            Id = 100,
+            Name = "Buy food",
+            IsComplete = false
+        };
+        
+        // Serialize for POST
+        var postContent = new StringContent(JsonSerializer.Serialize(testDeleteItem), Encoding.UTF8, "application/json");
+    
+        // POST (Create)
+        var postResponse = await client.PostAsync("api/Todo", postContent);
+        postResponse.EnsureSuccessStatusCode();
+    
+        var postBody = await postResponse.Content.ReadAsStringAsync();
+        var createdItem = JsonSerializer.Deserialize<TodoItemDTO>(postBody, JsonSerializerOptions.Web);
+    
+        // Act
+        // DELETE with correct route containing ID
+        var deleteResponse = await client.DeleteAsync($"api/Todo/{testDeleteItem.Id}");
+    
+        // Assert
+        // POST created initial item
+        (createdItem?.Name).Should().Be(testDeleteItem.Name);
+        (createdItem?.IsComplete).Should().BeFalse();
+    
+        // DELETE item no longer exists
+        deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
     
 }

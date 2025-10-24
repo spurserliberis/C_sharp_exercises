@@ -8,7 +8,7 @@ public interface ITodoRepository
     public Task<TodoItem?> GetTodoItem(long id);
     public Task PutTodoItem(long id, TodoItem todoItem);
     public Task PostTodoItem(TodoItem todoItem);
-    public Task DeleteTodoItem(TodoItem todoItem);
+    public Task DeleteTodoItem(long id);
     public bool TodoItemExists(long id);
 }
 

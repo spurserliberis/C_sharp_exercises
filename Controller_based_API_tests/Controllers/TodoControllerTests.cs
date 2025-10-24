@@ -350,22 +350,18 @@ public class TodoControllerTests()
     {
         // Arrange
         long testId = 10;
-    
-        var testListDto = new TodoItemDTO
-        {
-            Id = testId,
-            Name = "test put",
-            IsComplete = true
-        };
         
         var mockRepo = Substitute.For<ITodoRepository>();
         var controller = new TodoController(mockRepo);
     
+        // Tell the mock to return a valid TodoItem when GetTodoItem(10) is called
+        mockRepo.GetTodoItem(testId).Returns(new TodoItem { Id = testId, Name = "Test", IsComplete = false });
+
         // Act
-        var response = await controller.DeleteTodoItem(testListDto);
+        var response = await controller.DeleteTodoItem(testId);
         
         // Assert
-        await mockRepo.Received().DeleteTodoItem(Arg.Is<TodoItem>(todoItem => todoItem.Id == testId));
+        await mockRepo.Received().DeleteTodoItem(testId);
         response.Should().BeOfType<NoContentResult>();
     }
     

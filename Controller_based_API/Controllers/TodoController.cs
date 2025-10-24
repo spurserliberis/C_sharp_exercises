@@ -101,14 +101,36 @@ namespace Controller_based_API.Controllers
         }
   
         // DELETE: api/Todo/5
+        // [HttpDelete("{id}")]
+        // public async Task<IActionResult> DeleteTodoItem(TodoItemDTO todoItemDTO)
+        // {
+        // var todoItem = DTOToItem(todoItemDTO);
+        // await _todoRepository.DeleteTodoItem(todoItem);
+        //
+        // return NoContent();
+        // }
+        
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTodoItem(TodoItemDTO todoItemDTO)
+        // route expects an id, which matches the parameter
+        // deserialisation is not required as the action doesn't expect a body
+        public async Task<IActionResult> DeleteTodoItem(long id)
         {
-        var todoItem = DTOToItem(todoItemDTO);
-        await _todoRepository.DeleteTodoItem(todoItem);
+            // method fetches entity from database
+            var todoItem = await _todoRepository.GetTodoItem(id);
+            // if it doesn't exist, it returns a 404
+            if (todoItem == null)
+            {
+                return NotFound();
+            }
+            // otherwise the item is deleted
+            await _todoRepository.DeleteTodoItem(id);
+            return NoContent();
+        } 
+       // id is automatically bound from the URL
+       // No request body is required.
+       // EF Core correctly deletes the tracked entity.
+       // fetch the entity server-side (tracked EF entity), then remove it. No deserialization issues.
 
-        return NoContent();
-        }
 
         private bool TodoItemExists(long id)
         {

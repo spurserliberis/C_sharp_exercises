@@ -45,12 +45,30 @@ public class TodoRepository : ITodoRepository
         await _todoContext.SaveChangesAsync();
     }
     
-    public async Task DeleteTodoItem(TodoItem item)
+    // public async Task DeleteTodoItem(TodoItem item)
+    // {
+    //     _todoContext.TodoItems.Remove(item);
+    //     await _todoContext.SaveChangesAsync();
+    // }
+    
+    public async Task DeleteTodoItem(long id)
     {
-        _todoContext.TodoItems.Remove(item);
+        // Step 1: Find the entity in the database using the ID.
+        var todoItem = await _todoContext.TodoItems.FindAsync(id);
+
+        // Step 2: If not found, safely return (no exception thrown).
+        if (todoItem == null)
+        {
+            return;
+        }
+
+        // Step 3: Tell EF Core to remove this entity from the DbSet. Remove expects an entity, so can't 
+        // remove id directly
+        _todoContext.TodoItems.Remove(todoItem);
+
+        // Step 4: Persist the change to the database (runs DELETE SQL).
         await _todoContext.SaveChangesAsync();
     }
-    
     // Check that the todoitem exists
     public bool TodoItemExists(long id)
     {
