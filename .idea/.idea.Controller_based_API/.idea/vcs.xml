@@ -2,5 +2,29 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Documents.Collection" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Funding.Disbursements" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Funding.Infrastructure" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Funding.MerchantPaymentAccounts" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Funding.Modulr" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Funding.PaymentAllocator" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Funding.SalesforceService" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Funding.Vector" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Liberis.ApplicationService" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Liberis.Paris" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Liberis.SchemaRegistry" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../PartnerDefinitionService" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Pluralsight_courses" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Verdict" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../bca-eligibility-service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../bca-gcp-iac" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../bca-service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../contracts-service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../documents-collection-ui" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../external-check-service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../model-scoring-pipeline" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../targeting-eligibility-service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../targeting-partner-client-service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../vector" vcs="Git" />
   </component>
 </project>

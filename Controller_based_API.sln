@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Controller_based_API", "Con
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Controller_based_API_tests", "Controller_based_API_tests\Controller_based_API_tests.csproj", "{14657831-3F66-4410-861E-F668FC3CEF97}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test_driven_development_course_PS", "Test_driven_development_course_PS", "{22E65791-4029-4AB9-8AB4-2C6E87E2B2A5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TDD_course_Pluralsight", "TDD_course_Pluralsight", "{9F3A0E2A-C116-449E-85E7-FBEEA6FBDB64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
